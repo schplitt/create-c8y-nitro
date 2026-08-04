@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "noEmit": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "lib": ["ES2023"],
+    "target": "ES2023",
+    "skipLibCheck": true
+  },
+  "include": ["src", "test", "tsdown.config.ts"],
+  "exclude": ["test/fixtures"]
+}

@@ -1,0 +1,72 @@
+{
+  "name": "create-c8y-nitro",
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@11.11.0",
+  "description": "Scaffold a Cumulocity IoT microservice powered by c8y-nitro",
+  "keywords": [
+    "cumulocity",
+    "c8y",
+    "microservice",
+    "nitro",
+    "scaffold",
+    "create",
+    "starter",
+    "typescript",
+    "iot"
+  ],
+  "license": "MIT",
+  "author": "schplitt",
+  "homepage": "https://github.com/schplitt/create-c8y-nitro#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schplitt/create-c8y-nitro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/schplitt/create-c8y-nitro/issues"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "create-c8y-nitro": "./dist/cli.mjs"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsdown --watch",
+    "build": "tsdown",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "typecheck": "tsc --noEmit",
+    "prerelease": "eslint && tsc --noEmit && tsdown && vitest run",
+    "release": "bumpp",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "devDependencies": {
+    "@schplitt/eslint-config": "catalog:",
+    "@types/node": "catalog:",
+    "bumpp": "catalog:",
+    "changelogithub": "catalog:",
+    "citty": "catalog:",
+    "consola": "catalog:",
+    "eslint": "catalog:",
+    "giget": "catalog:",
+    "nypm": "catalog:",
+    "pathe": "catalog:",
+    "std-env": "catalog:",
+    "tinyexec": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}
