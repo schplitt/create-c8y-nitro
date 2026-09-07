@@ -1,1 +1,3 @@
-export default defineEventHandler(() => 'Hello from c8y-nitro!')
+import { defineHandler } from 'nitro'
+
+export default defineHandler(() => 'Hello from c8y-nitro!')
