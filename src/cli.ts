@@ -194,6 +194,9 @@ const main = defineCommand({
     })
 
     consola.success(`Scaffolded ${colors.cyan(result.name)} in ${colors.cyan(result.dir)}`)
+    if (result.gitInitError) {
+      consola.warn(`Could not initialize a git repository: ${result.gitInitError}`)
+    }
     if (result.author) {
       const from = authorSource ? ` (from ${authorSource})` : ''
       consola.log(colors.dim(`  author: ${formatAuthor(result.author)}${from}`))

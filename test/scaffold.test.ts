@@ -353,6 +353,31 @@ describe('scaffold', () => {
     await expect(readScaffoldedPkg(result.dir)).resolves.not.toHaveProperty('author')
   })
 
+  it('completes the scaffold when `git init` fails', async () => {
+    // No `git` on PATH: the repository cannot be created, but the project must
+    // still be patched — otherwise it keeps the template's name and author.
+    const prevPath = process.env.PATH
+    process.env.PATH = ''
+    try {
+      const result = await scaffold({
+        dir: 'no-git-binary',
+        cwd,
+        template: FIXTURE_TEMPLATE,
+        install: false,
+        gitInit: true,
+      })
+
+      expect(result.gitInitError).toBeTruthy()
+      expect(result.author).toBeUndefined()
+
+      const pkg = await readScaffoldedPkg(result.dir)
+      expect(pkg.name).toBe('no-git-binary')
+      expect(pkg).not.toHaveProperty('author')
+    } finally {
+      process.env.PATH = prevPath
+    }
+  })
+
   it('picks up a directory-scoped git identity, which needs `git init` first', async () => {
     // A `includeIf "gitdir:…"` identity only resolves from inside a repository,
     // so this only works because `scaffold` runs `git init` before detecting.

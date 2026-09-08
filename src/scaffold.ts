@@ -100,6 +100,11 @@ export interface ScaffoldResult {
    * Author written to package.json, or `undefined` if none could be resolved.
    */
   author?: PackageAuthor
+  /**
+   * Set when `gitInit` was requested but failed — e.g. `git` is not installed.
+   * The scaffold itself still completed.
+   */
+  gitInitError?: string
 }
 
 /**
@@ -283,9 +288,16 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
   }
 
   // Initialize git before detecting the author, so that a `git config`
-  // `includeIf "gitdir:…"` identity resolves against the new repository.
+  // `includeIf "gitdir:…"` identity resolves against the new repository. A
+  // failure here must not abort the scaffold, or the project would be left
+  // with the template's package.json — including the template's author.
+  let gitInitError: string | undefined
   if (options.gitInit) {
-    await x('git', ['init'], { nodeOptions: { cwd: dir, stdio: 'ignore' }, throwOnError: true })
+    try {
+      await x('git', ['init'], { nodeOptions: { cwd: dir, stdio: 'ignore' }, throwOnError: true })
+    } catch (error) {
+      gitInitError = error instanceof Error ? error.message : String(error)
+    }
   }
 
   const name = slugifyPackageName(options.name ?? basename(dir))
@@ -301,5 +313,5 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
     })
   }
 
-  return { dir, name, author }
+  return { dir, name, author, gitInitError }
 }

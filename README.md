@@ -15,7 +15,7 @@ This downloads the [c8y-nitro-starter](https://github.com/schplitt/c8y-nitro-sta
 - `author` is set from your `git config user.name` / `user.email` (or `--author`), replacing the template's — Cumulocity requires it. Detection runs after `git init`, so a directory-specific identity (`includeIf "gitdir:…"`) resolves correctly; if nothing is found you are asked, and warned if you skip.
 - the remaining template metadata (`homepage`, `bugs`, `description`, …) is stripped
 
-Then it initializes git and installs dependencies with your package manager.
+Then — if you ask it to — it initializes git and installs dependencies with your package manager. A failed `git init` (no `git` installed, say) is reported but does not fail the scaffold.
 
 ## Options
 
