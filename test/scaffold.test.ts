@@ -165,11 +165,11 @@ describe('scaffold', () => {
 
     // everything the app actually needs survives
     expect(pkg.scripts).toMatchObject({ dev: 'nitro dev', build: 'nitro build' })
-    expect(pkg.dependencies).toMatchObject({ 'c8y-nitro': '^0.8.0' })
+    expect(pkg.dependencies).toMatchObject({ 'c8y-nitro': '^0.10.0' })
 
     // rest of the template is copied over
     await expect(readFile(join(result.dir, 'nitro.config.ts'), 'utf8')).resolves.toContain('defineNitroConfig')
-    await expect(readFile(join(result.dir, 'server/routes/index.ts'), 'utf8')).resolves.toContain('defineEventHandler')
+    await expect(readFile(join(result.dir, 'server/routes/index.ts'), 'utf8')).resolves.toContain('defineHandler')
   })
 
   it('slugifies the directory name', async () => {
