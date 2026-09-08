@@ -1,2 +1,19 @@
-export type { ScaffoldOptions, ScaffoldResult } from './scaffold'
-export { DEFAULT_TEMPLATE, patchPackageJson, scaffold, slugifyPackageName } from './scaffold'
+export type {
+  AuthorResolver,
+  AuthorSource,
+  DetectedAuthor,
+  PackageAuthor,
+  ScaffoldOptions,
+  ScaffoldResult,
+} from './scaffold'
+export {
+  authorFromEnv,
+  authorFromGit,
+  DEFAULT_TEMPLATE,
+  detectAuthor,
+  formatAuthor,
+  parseAuthor,
+  patchPackageJson,
+  scaffold,
+  slugifyPackageName,
+} from './scaffold'

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import type { PackageManagerName } from 'nypm'
+import type { ScaffoldOptions } from './scaffold'
 import process from 'node:process'
 import { defineCommand, runMain } from 'citty'
 import { consola } from 'consola'
@@ -11,6 +12,7 @@ import pkg from '../package.json' with { type: 'json' }
 import {
   DEFAULT_TEMPLATE,
   detectCurrentPackageManager,
+  formatAuthor,
   isNonEmptyDir,
   packageManagerNames,
   scaffold,
@@ -33,6 +35,10 @@ const main = defineCommand({
     name: {
       type: 'string',
       description: 'Package / microservice name (defaults to the directory name)',
+    },
+    author: {
+      type: 'string',
+      description: 'Author as `Name <email>` (defaults to your git config; pass an empty string for none)',
     },
     template: {
       type: 'string',
@@ -152,9 +158,31 @@ const main = defineCommand({
         : false
     }
 
+    // Resolve the package.json author, which Cumulocity requires. Detection
+    // happens inside `scaffold`, once the target directory exists and `git
+    // init` has run, so that per-directory git identities resolve.
+    let authorSource: string | undefined
+    const author: ScaffoldOptions['author'] = args.author === undefined
+      ? async (detected) => {
+        if (detected) {
+          authorSource = detected.source
+          return detected.author
+        }
+        if (!interactive) {
+          return undefined
+        }
+        return await consola.prompt('Who is the author of this microservice?', {
+          type: 'text',
+          placeholder: 'Jane Doe <jane@example.com>',
+          cancel: 'undefined',
+        }) || undefined
+      }
+      : args.author
+
     const result = await scaffold({
       dir,
       name: args.name,
+      author,
       template: args.template,
       force,
       install,
@@ -166,6 +194,15 @@ const main = defineCommand({
     })
 
     consola.success(`Scaffolded ${colors.cyan(result.name)} in ${colors.cyan(result.dir)}`)
+    if (result.gitInitError) {
+      consola.warn(`Could not initialize a git repository: ${result.gitInitError}`)
+    }
+    if (result.author) {
+      const from = authorSource ? ` (from ${authorSource})` : ''
+      consola.log(colors.dim(`  author: ${formatAuthor(result.author)}${from}`))
+    } else if (args.author === undefined) {
+      consola.warn(`No author detected — set ${colors.cyan('author')} in package.json, or scaffold with ${colors.cyan('--author "Name <email>"')}.`)
+    }
     consola.info('Next steps:')
     const relativeDir = relative(process.cwd(), result.dir) || '.'
     if (relativeDir !== '.') {

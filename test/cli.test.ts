@@ -22,7 +22,7 @@ describe.skipIf(!existsSync(CLI_PATH))('cli (e2e, requires `pnpm build`)', () =>
   })
 
   it('scaffolds a project end to end', async () => {
-    const result = await x('node', [CLI_PATH, 'my-cli-service', '--template', FIXTURE_TEMPLATE, '--no-install', '--no-git'], {
+    const result = await x('node', [CLI_PATH, 'my-cli-service', '--template', FIXTURE_TEMPLATE, '--author', '', '--no-install', '--no-git'], {
       nodeOptions: { cwd },
       throwOnError: true,
     })
@@ -32,6 +32,7 @@ describe.skipIf(!existsSync(CLI_PATH))('cli (e2e, requires `pnpm build`)', () =>
     const pkg = JSON.parse(await readFile(join(cwd, 'my-cli-service/package.json'), 'utf8'))
     expect(pkg.name).toBe('my-cli-service')
     expect(pkg.version).toBe('0.0.0')
+    // `--author ""` opts out explicitly; the template's author must not leak
     expect(pkg).not.toHaveProperty('author')
     expect(pkg).not.toHaveProperty('homepage')
     expect(existsSync(join(cwd, 'my-cli-service/.git'))).toBe(false)
@@ -46,6 +47,30 @@ describe.skipIf(!existsSync(CLI_PATH))('cli (e2e, requires `pnpm build`)', () =>
     const pkg = JSON.parse(await readFile(join(cwd, 'some-dir/package.json'), 'utf8'))
     expect(pkg.name).toBe('custom-name')
     expect(existsSync(join(cwd, 'some-dir/.git'))).toBe(true)
+  })
+
+  it('writes the author from --author', async () => {
+    await x('node', [CLI_PATH, 'authored', '--author', 'Jane Doe <jane@example.com>', '--template', FIXTURE_TEMPLATE, '--no-install', '--no-git'], {
+      nodeOptions: { cwd },
+      throwOnError: true,
+    })
+
+    const pkg = JSON.parse(await readFile(join(cwd, 'authored/package.json'), 'utf8'))
+    expect(pkg.author).toEqual({ name: 'Jane Doe', email: 'jane@example.com' })
+  })
+
+  it('falls back to the git identity when --author is omitted', async () => {
+    await x('git', ['init'], { nodeOptions: { cwd, stdio: 'ignore' }, throwOnError: true })
+    await x('git', ['config', '--local', 'user.name', 'Git Dev'], { nodeOptions: { cwd }, throwOnError: true })
+    await x('git', ['config', '--local', 'user.email', 'git-dev@example.com'], { nodeOptions: { cwd }, throwOnError: true })
+
+    await x('node', [CLI_PATH, 'from-git', '--template', FIXTURE_TEMPLATE, '--no-install', '--no-git'], {
+      nodeOptions: { cwd },
+      throwOnError: true,
+    })
+
+    const pkg = JSON.parse(await readFile(join(cwd, 'from-git/package.json'), 'utf8'))
+    expect(pkg.author).toEqual({ name: 'Git Dev', email: 'git-dev@example.com' })
   })
 
   it('fails on a non-empty directory without --force', async () => {
