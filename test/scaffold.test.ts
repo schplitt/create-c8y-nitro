@@ -165,7 +165,7 @@ describe('scaffold', () => {
 
     // everything the app actually needs survives
     expect(pkg.scripts).toMatchObject({ dev: 'nitro dev', build: 'nitro build' })
-    expect(pkg.dependencies).toMatchObject({ 'c8y-nitro': '^0.10.0' })
+    expect(pkg.dependencies).toMatchObject({ 'c8y-nitro': '^0.12.0' })
 
     // rest of the template is copied over
     await expect(readFile(join(result.dir, 'nitro.config.ts'), 'utf8')).resolves.toContain('defineNitroConfig')
